@@ -30,6 +30,12 @@ tasks.withType(JavaCompile).configureEach {
 
 processResources {
     filesMatching('plugin.yml') {
-        expand(version: project.version)
+        expand(
+                version: project.version
+        )
     }
+}
+
+tasks.jar {
+    archiveBaseName = 'RyxnChatGuard'
 }
