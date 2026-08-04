@@ -50,7 +50,9 @@ public final class RyxnChatGuard extends JavaPlugin {
                         this
                 );
 
-        getCommand("rcg").setExecutor(this);
+        if (getCommand("rcg") != null) {
+            getCommand("rcg").setExecutor(this);
+        }
 
         getLogger().info(
                 "================================"
@@ -67,6 +69,10 @@ public final class RyxnChatGuard extends JavaPlugin {
 
         getLogger().info(
                 "Made by Ryxn"
+        );
+
+        getLogger().info(
+                "Paper 1.21+"
         );
 
         getLogger().info(
@@ -102,7 +108,9 @@ public final class RyxnChatGuard extends JavaPlugin {
         this.alerts = alerts;
     }
 
-    public int getOffences(Player player) {
+    public int getOffences(
+            Player player
+    ) {
 
         return offences.getOrDefault(
                 player.getUniqueId(),
@@ -110,19 +118,18 @@ public final class RyxnChatGuard extends JavaPlugin {
         );
     }
 
-    public int addOffence(Player player) {
+    public int addOffence(
+            Player player
+    ) {
 
         UUID uuid =
                 player.getUniqueId();
 
-        int offence =
-                offences.merge(
-                        uuid,
-                        1,
-                        Integer::sum
-                );
-
-        return offence;
+        return offences.merge(
+                uuid,
+                1,
+                Integer::sum
+        );
     }
 
     public void resetOffences(
@@ -211,6 +218,32 @@ public final class RyxnChatGuard extends JavaPlugin {
         return punishmentManager;
     }
 
+    /*
+     * Called by ChatFilter when a player
+     * violates a chat rule.
+     */
+    public void handleChatViolation(
+            Player player,
+            String category,
+            String message
+    ) {
+
+        if (player == null
+                || category == null) {
+            return;
+        }
+
+        if (punishmentManager == null) {
+            return;
+        }
+
+        punishmentManager.handleViolation(
+                player,
+                category,
+                message
+        );
+    }
+
     public void alertStaff(
             String message
     ) {
@@ -257,4 +290,4 @@ public final class RyxnChatGuard extends JavaPlugin {
                 )
         );
     }
-  }
+}
