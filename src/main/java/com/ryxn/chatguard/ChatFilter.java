@@ -149,12 +149,6 @@ public final class ChatFilter implements Listener {
 
         /*
          * HEAVY ADVERTISING
-         *
-         * Examples:
-         * play.example.com
-         * example.net
-         * server.example.org
-         * 123.123.123.123
          */
         if (isHeavyAdvertisement(original)) {
 
@@ -257,16 +251,7 @@ public final class ChatFilter implements Listener {
     }
 
     /*
-     * Normalize text.
-     *
-     * Examples:
-     *
-     * H.A.C.K
-     * h-a-c-k
-     * h a c k
-     * H4CK
-     *
-     * become easier to detect.
+     * NORMALIZE TEXT
      */
     private String normalize(String message) {
 
@@ -277,17 +262,11 @@ public final class ChatFilter implements Listener {
         String text =
                 message.toLowerCase(Locale.ROOT);
 
-        /*
-         * Remove spaces and common separators.
-         */
         text = text.replaceAll(
                 "[\\s._\\-]+",
                 ""
         );
 
-        /*
-         * Basic leetspeak.
-         */
         text = text
                 .replace("0", "o")
                 .replace("1", "i")
@@ -303,9 +282,6 @@ public final class ChatFilter implements Listener {
 
     /*
      * CHAT SPAM CHECK
-     *
-     * Four repeated messages within
-     * a short period counts as spam.
      */
     private boolean isSpam(
             Player player,
@@ -355,8 +331,7 @@ public final class ChatFilter implements Listener {
                         );
 
                 /*
-                 * Three repeats after the
-                 * original message = 4 total.
+                 * Four total repeated messages.
                  */
                 if (count >= 3) {
                     return true;
@@ -452,7 +427,7 @@ public final class ChatFilter implements Listener {
         }
 
         /*
-         * Minecraft/server domains.
+         * Common domain extensions.
          */
         if (lower.matches(
                 ".*\\b[a-z0-9-]+\\."
@@ -463,7 +438,7 @@ public final class ChatFilter implements Listener {
         }
 
         /*
-         * Common server-hosting domains.
+         * Common Minecraft hosting domains.
          */
         String[] hostingDomains = {
                 ".aternos.",
@@ -571,24 +546,38 @@ public final class ChatFilter implements Listener {
         }
 
         /*
-         * Minecraft command-style
-         * cheat mentions.
+         * Minecraft command-style cheat mentions.
          */
         if (message.contains("minecraftxray")
                 || message.contains("minecraftxraymod")
                 || message.contains("xraymod")) {
 
-            private void handleViolation(
-        Player player,
-        String type,
-        String message
-) {
-    plugin.getPunishmentManager().handleViolation(
-            player,
-            type,
-            message
-    );
-}
+            return true;
+        }
+
+        return false;
+    }
+
+    /*
+     * SEND VIOLATION TO PUNISHMENT MANAGER
+     */
+    private void handleViolation(
+            Player player,
+            String type,
+            String message
+    ) {
+
+        plugin.getPunishmentManager()
+                .handleViolation(
+                        player,
+                        type,
+                        message
+                );
+    }
+
+    /*
+     * FORMAT MUTE DURATION
+     */
     private String formatDuration(
             long milliseconds
     ) {
@@ -638,6 +627,10 @@ public final class ChatFilter implements Listener {
                     .append("s");
         }
 
+        if (result.length() == 0) {
+            return "0s";
+        }
+
         return result.toString().trim();
     }
-  }
+}
