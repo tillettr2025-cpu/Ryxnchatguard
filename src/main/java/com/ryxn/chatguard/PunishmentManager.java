@@ -117,11 +117,13 @@ public final class PunishmentManager {
 
         if (ipBan) {
 
-            player.ban(
-                    reason,
-                    null,
-                    "RyxnChatGuard"
-            );
+            else {
+    player.ban(
+            reason,
+            (java.time.Duration) null,
+            "RyxnChatGuard"
+    );
+}
 
         } else {
     player.ban(
