@@ -578,31 +578,17 @@ public final class ChatFilter implements Listener {
                 || message.contains("minecraftxraymod")
                 || message.contains("xraymod")) {
 
-            return true;
-        }
-
-        return false;
-    }
-
-    /*
-     * Send violation to the main plugin.
-     */
-    private void handleViolation(
-            Player player,
-            String type,
-            String message
-    ) {
-
-        plugin.handleChatViolation(
-                player,
-                type,
-                message
-        );
-    }
-
-    /*
-     * Format mute duration.
-     */
+            private void handleViolation(
+        Player player,
+        String type,
+        String message
+) {
+    plugin.getPunishmentManager().handleViolation(
+            player,
+            type,
+            message
+    );
+}
     private String formatDuration(
             long milliseconds
     ) {
