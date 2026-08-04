@@ -1,6 +1,7 @@
 package com.ryxn.chatguard;
 
 import org.bukkit.ChatColor;
+import java.time.Duration;
 import org.bukkit.entity.Player;
 
 public final class PunishmentManager {
@@ -123,13 +124,12 @@ public final class PunishmentManager {
             );
 
         } else {
-
-            player.ban(
-                    reason,
-                    null,
-                    "RyxnChatGuard"
-            );
-        }
+    player.ban(
+            reason,
+            (java.time.Duration) null,
+            "RyxnChatGuard"
+    );
+}
 
         player.kickPlayer(
                 ChatColor.RED
