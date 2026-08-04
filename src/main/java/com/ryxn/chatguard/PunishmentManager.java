@@ -1,8 +1,8 @@
 package com.ryxn.chatguard;
 
-import org.bukkit.ChatColor;
-import java.time.Duration;
 import org.bukkit.entity.Player;
+
+import java.time.Duration;
 
 public final class PunishmentManager {
 
@@ -25,25 +25,26 @@ public final class PunishmentManager {
                         + offence;
 
         String action =
-                plugin.getConfig()
-                        .getString(
-                                path + ".action",
-                                "MUTE"
-                        );
+                plugin.getConfig().getString(
+                        path + ".action",
+                        "MUTE"
+                );
 
         long duration =
-                plugin.getConfig()
-                        .getLong(
-                                path + ".duration",
-                                0L
-                        );
+                plugin.getConfig().getLong(
+                        path + ".duration",
+                        0L
+                );
 
         String reason =
-                plugin.getConfig()
-                        .getString(
-                                path + ".reason",
-                                "ChatGuard violation"
-                        );
+                plugin.getConfig().getString(
+                        path + ".reason",
+                        "ChatGuard violation"
+                );
+
+        if (action == null) {
+            action = "MUTE";
+        }
 
         if (action.equalsIgnoreCase("WARN")) {
 
@@ -86,7 +87,8 @@ public final class PunishmentManager {
             ban(
                     player,
                     reason,
-                    false
+                    false,
+                    duration
             );
 
             return;
@@ -97,96 +99,178 @@ public final class PunishmentManager {
             ban(
                     player,
                     reason,
-                    true
+                    true,
+                    duration
             );
+
+            return;
         }
+
+        plugin.getLogger().warning(
+                "Unknown punishment action '"
+                        + action
+                        + "' for "
+                        + category
+                        + " offence "
+                        + offence
+        );
     }
 
     private void ban(
             Player player,
             String reason,
-            boolean ipBan
+            boolean ipBan,
+            long duration
     ) {
 
-        String durationText =
-                plugin.getConfig()
-                        .getString(
-                                "punishments.ban-duration",
-                                "permanent"
-                        );
+        /*
+         * Paper 1.21+ has multiple ban()
+         * overloads. We explicitly use Duration
+         * so Java cannot confuse it with Instant.
+         */
 
-        if (ipBan) {
+        if (duration <= 0) {
 
-            else {
-    player.ban(
-            reason,
-            (java.time.Duration) null,
-            "RyxnChatGuard"
-    );
-}
+            player.ban(
+                    reason,
+                    Duration.ZERO,
+                    "RyxnChatGuard"
+            );
 
         } else {
-    player.ban(
-            reason,
-            (java.time.Duration) null,
-            "RyxnChatGuard"
-    );
-}
+
+            player.ban(
+                    reason,
+                    Duration.ofMillis(duration),
+                    "RyxnChatGuard"
+            );
+        }
+
+        /*
+         * IP-ban handling.
+         *
+         * The normal Player.ban() call bans the
+         * player account. If IP banning is enabled
+         * in the server implementation, use the
+         * server's IP ban system as well.
+         */
+        if (ipBan) {
+
+            String address =
+                    player.getAddress() != null
+                            && player.getAddress().getAddress() != null
+                            ? player.getAddress()
+                                    .getAddress()
+                                    .getHostAddress()
+                            : null;
+
+            if (address != null) {
+
+                plugin.getServer()
+                        .getBanList(
+                                org.bukkit.BanList.Type.IP
+                        )
+                        .addBan(
+                                address,
+                                reason,
+                                duration <= 0
+                                        ? null
+                                        : new java.util.Date(
+                                                System.currentTimeMillis()
+                                                        + duration
+                                        ),
+                                "RyxnChatGuard"
+                        );
+            }
+        }
 
         player.kickPlayer(
-                ChatColor.RED
-                        + "You have been banned.\n\n"
-                        + ChatColor.WHITE
-                        + "Reason: "
+                "§cYou have been banned.\n\n"
+                        + "§7Reason: §f"
                         + reason
-                        + "\n"
-                        + ChatColor.GRAY
-                        + "Duration: "
-                        + durationText
+        );
+    }
+
+    private String format(long milliseconds) {
+
+        long seconds =
+                Math.max(
+                        0L,
+                        milliseconds / 1000L
+                );
+
+        long days =
+                seconds / 86400L;
+
+        seconds %= 86400L;
+
+        long hours =
+                seconds / 3600L;
+
+        seconds %= 3600L;
+
+        long minutes =
+                seconds / 60L;
+
+        seconds %= 60L;
+
+        StringBuilder result =
+                new StringBuilder();
+
+        if (days > 0) {
+            result.append(days)
+                    .append("d ");
+        }
+
+        if (hours > 0) {
+            result.append(hours)
+                    .append("h ");
+        }
+
+        if (minutes > 0) {
+            result.append(minutes)
+                    .append("m ");
+        }
+
+        if (seconds > 0 || result.length() == 0) {
+            result.append(seconds)
+                    .append("s");
+        }
+
+        return result.toString().trim();
+    }
+
+    /*
+     * Used by ChatFilter.
+     */
+    public void handleViolation(
+            Player player,
+            String category,
+            String message
+    ) {
+
+        if (player == null
+                || category == null) {
+            return;
+        }
+
+        int offence =
+                plugin.addOffence(player);
+
+        punish(
+                player,
+                category,
+                offence
         );
 
         plugin.alertStaff(
                 "&c"
                         + player.getName()
-                        + " &7was banned by "
-                        + "&bRyxnChatGuard"
-                        + " &7for &e"
-                        + reason
+                        + " &7triggered &e"
+                        + category
+                        + " &7(offence &c"
+                        + offence
+                        + "&7)"
         );
     }
-
-    private String format(
-            long milliseconds
-    ) {
-
-        long seconds =
-                milliseconds / 1000;
-
-        long days =
-                seconds / 86400;
-
-        seconds %= 86400;
-
-        long hours =
-                seconds / 3600;
-
-        seconds %= 3600;
-
-        long minutes =
-                seconds / 60;
-
-        if (days > 0) {
-            return days + "d";
         }
-
-        if (hours > 0) {
-            return hours + "h";
-        }
-
-        if (minutes > 0) {
-            return minutes + "m";
-        }
-
-        return seconds + "s";
-    }
-  }
