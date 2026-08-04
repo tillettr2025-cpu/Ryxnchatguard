@@ -1,0 +1,78 @@
+enabled: true
+
+alerts:
+  enabled: true
+
+filters:
+
+  hate-speech:
+    - "example"
+
+  self-harm:
+    - "example"
+
+  light-advertising:
+    - "2b2t"
+    - "minehut"
+
+  account-selling:
+    - "selling minecraft account"
+    - "selling mc account"
+
+  threats:
+    - "ddos"
+    - "dox"
+    - "doxx"
+    - "swat"
+
+  doxxing:
+    - "your ip"
+    - "leak your ip"
+
+punishments:
+
+  spam:
+    - "15m"
+    - "1h"
+    - "3h"
+    - "6h"
+    - "12h"
+    - "1d"
+
+  hate-speech:
+    - "1d"
+    - "7d"
+    - "14d"
+    - "30d"
+    - "perm"
+
+  self-harm:
+    - "3d"
+    - "7d"
+    - "30d"
+    - "7d-ban"
+    - "perm-ban"
+
+  light-advertising:
+    - "1d"
+    - "2d"
+    - "7d"
+    - "30d"
+
+  heavy-advertising:
+    - "perm-mute"
+
+  cheating:
+    - "7d-ban"
+    - "14d-ban"
+    - "30d-ban"
+    - "perm-ban"
+
+  account-selling:
+    - "perm-ipban"
+
+  threats:
+    - "perm-ipban"
+
+  doxxing:
+    - "perm-ipban"
