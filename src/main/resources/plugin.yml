@@ -1,0 +1,22 @@
+name: RyxnChatGuard
+version: ${version}
+main: com.ryxn.chatguard.RyxnChatGuard
+api-version: '1.21'
+author: Ryxn
+description: Advanced chat moderation and punishment system.
+
+commands:
+  rcg:
+    description: RyxnChatGuard management command
+    usage: /rcg <help|reload|status|mute|unmute|ban|unban>
+    aliases:
+      - chatguard
+
+permissions:
+  ryxnchatguard.bypass:
+    description: Bypass RyxnChatGuard chat filtering
+    default: op
+
+  ryxnchatguard.staff:
+    description: Manage RyxnChatGuard
+    default: op
